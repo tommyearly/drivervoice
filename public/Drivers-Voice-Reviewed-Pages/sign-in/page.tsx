@@ -1,0 +1,16 @@
+import type { Metadata } from "next";
+import { SignInForm } from "@/components/sign-in-form";
+import { resolveMode } from "@/lib/domain";
+
+export const metadata: Metadata = { title: "Sign in", robots: { index: false, follow: false } };
+
+export default function SignInPage() {
+  return (
+    <main id="main" className="mx-auto max-w-3xl px-5 py-14">
+      <h1 className="font-serif text-4xl">Driver sign in</h1>
+      <div className="mt-4 grid gap-3 text-[var(--dv-muted)]"><p>Use the email address linked to your invitation. Do not use a company payroll, staff-portal or union password. Access approval confirms eligibility for this forum only; it does not confirm union membership or a representative appointment.</p></div>
+      <p className="mt-4 text-xl">Access is by invitation. Signing in does not confirm eligibility, and this is not an official company or union account.</p>
+      <SignInForm demonstration={resolveMode(process.env) !== "live"} />
+    </main>
+  );
+}

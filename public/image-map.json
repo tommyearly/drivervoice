@@ -1,0 +1,276 @@
+{
+  "assets": {
+    "home": {
+      "src": "/illustrations/drivers-voice/home.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "Fictional drivers reviewing a clipboard beside a generic bus.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration. People are fictional; this does not depict a real event."
+    },
+    "our-plan": {
+      "src": "/illustrations/drivers-voice/our-plan.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "Fictional drivers discussing a proposed working plan around a table.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration. People are fictional; this does not depict a real event."
+    },
+    "priorities": {
+      "src": "/illustrations/drivers-voice/priorities.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "Illustrated cards representing pay, rosters and working time.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration; not a real record or result."
+    },
+    "updates": {
+      "src": "/illustrations/drivers-voice/updates.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "A fictional driver reviewing updates on a tablet.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration. People are fictional; this does not depict a real event."
+    },
+    "about": {
+      "src": "/illustrations/drivers-voice/about.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "A fictional group of drivers outside a generic bus depot.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration. People are fictional; this does not depict a real event."
+    },
+    "conduct": {
+      "src": "/illustrations/drivers-voice/conduct.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "Fictional drivers listening to one another in a respectful discussion.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration. People are fictional; this does not depict a real event."
+    },
+    "privacy": {
+      "src": "/illustrations/drivers-voice/privacy.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "A closed folder and lock motif representing careful handling of records.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration; not a real record or result."
+    },
+    "contact": {
+      "src": "/illustrations/drivers-voice/contact.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "A fictional driver having a supportive private conversation with a volunteer.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration. People are fictional; this does not depict a real event."
+    },
+    "records": {
+      "src": "/illustrations/drivers-voice/records.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "A fictional driver entering a workplace concern on a laptop.",
+      "objectPosition": "center",
+      "caption": "Conceptual illustration. People are fictional; this does not depict a real event."
+    }
+  },
+  "routes": [
+    {
+      "route": "/",
+      "sourceFile": "page.tsx",
+      "asset": "home",
+      "variant": "hero"
+    },
+    {
+      "route": "/about",
+      "sourceFile": "about/page.tsx",
+      "asset": "about",
+      "variant": "public-banner"
+    },
+    {
+      "route": "/admin",
+      "sourceFile": "admin/page.tsx",
+      "asset": "records",
+      "variant": "dashboard"
+    },
+    {
+      "route": "/admin/actions",
+      "sourceFile": "admin/actions/page.tsx",
+      "asset": "our-plan",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/audit",
+      "sourceFile": "admin/audit/page.tsx",
+      "asset": "records",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/members",
+      "sourceFile": "admin/members/page.tsx",
+      "asset": "about",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/process-tracker",
+      "sourceFile": "admin/process-tracker/page.tsx",
+      "asset": "our-plan",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/reports",
+      "sourceFile": "admin/reports/page.tsx",
+      "asset": "records",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/reports/[id]",
+      "sourceFile": "admin/reports/[id]/page.tsx",
+      "asset": "records",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/settings",
+      "sourceFile": "admin/settings/page.tsx",
+      "asset": "privacy",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/surveys",
+      "sourceFile": "admin/surveys/page.tsx",
+      "asset": "priorities",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/updates",
+      "sourceFile": "admin/updates/page.tsx",
+      "asset": "updates",
+      "variant": "detail"
+    },
+    {
+      "route": "/admin/volunteers",
+      "sourceFile": "admin/volunteers/page.tsx",
+      "asset": "about",
+      "variant": "detail"
+    },
+    {
+      "route": "/code-of-conduct",
+      "sourceFile": "code-of-conduct/page.tsx",
+      "asset": "conduct",
+      "variant": "legal"
+    },
+    {
+      "route": "/contact",
+      "sourceFile": "contact/page.tsx",
+      "asset": "contact",
+      "variant": "form"
+    },
+    {
+      "route": "/our-plan",
+      "sourceFile": "our-plan/page.tsx",
+      "asset": "our-plan",
+      "variant": "public-banner"
+    },
+    {
+      "route": "/portal",
+      "sourceFile": "portal/page.tsx",
+      "asset": "home",
+      "variant": "dashboard"
+    },
+    {
+      "route": "/portal/account",
+      "sourceFile": "portal/account/page.tsx",
+      "asset": "privacy",
+      "variant": "detail"
+    },
+    {
+      "route": "/portal/actions",
+      "sourceFile": "portal/actions/page.tsx",
+      "asset": "our-plan",
+      "variant": "dashboard"
+    },
+    {
+      "route": "/portal/incidents/new",
+      "sourceFile": "portal/incidents/new/page.tsx",
+      "asset": "records",
+      "variant": "form"
+    },
+    {
+      "route": "/portal/priorities",
+      "sourceFile": "portal/priorities/page.tsx",
+      "asset": "priorities",
+      "variant": "dashboard"
+    },
+    {
+      "route": "/portal/questions",
+      "sourceFile": "portal/questions/page.tsx",
+      "asset": "contact",
+      "variant": "form"
+    },
+    {
+      "route": "/portal/reports",
+      "sourceFile": "portal/reports/page.tsx",
+      "asset": "records",
+      "variant": "dashboard"
+    },
+    {
+      "route": "/portal/reports/[id]",
+      "sourceFile": "portal/reports/[id]/page.tsx",
+      "asset": "records",
+      "variant": "detail"
+    },
+    {
+      "route": "/portal/reports/new",
+      "sourceFile": "portal/reports/new/page.tsx",
+      "asset": "records",
+      "variant": "form"
+    },
+    {
+      "route": "/portal/updates",
+      "sourceFile": "portal/updates/page.tsx",
+      "asset": "updates",
+      "variant": "dashboard"
+    },
+    {
+      "route": "/portal/updates/[slug]",
+      "sourceFile": "portal/updates/[slug]/page.tsx",
+      "asset": "updates",
+      "variant": "detail"
+    },
+    {
+      "route": "/portal/volunteer",
+      "sourceFile": "portal/volunteer/page.tsx",
+      "asset": "about",
+      "variant": "form"
+    },
+    {
+      "route": "/priorities",
+      "sourceFile": "priorities/page.tsx",
+      "asset": "priorities",
+      "variant": "public-banner"
+    },
+    {
+      "route": "/privacy",
+      "sourceFile": "privacy/page.tsx",
+      "asset": "privacy",
+      "variant": "legal"
+    },
+    {
+      "route": "/sign-in",
+      "sourceFile": "sign-in/page.tsx",
+      "asset": "privacy",
+      "variant": "form"
+    },
+    {
+      "route": "/updates",
+      "sourceFile": "updates/page.tsx",
+      "asset": "updates",
+      "variant": "public-banner"
+    },
+    {
+      "route": "/updates/[slug]",
+      "sourceFile": "updates/[slug]/page.tsx",
+      "asset": "updates",
+      "variant": "section-banner"
+    }
+  ]
+}
