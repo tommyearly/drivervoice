@@ -15,6 +15,7 @@ export default async function ContactPage() {
       <div className="mt-4 grid gap-3 text-[var(--dv-muted)]">
         <p>Use this form for a question about the forum or a correction to website content. Signed-in drivers should use the workplace-concern form for an individual employment issue. Passenger service queries belong on the <a className="underline" href="https://www.goaheadireland.ie/" rel="external noreferrer">company’s official website</a>.</p>
         <p>This inbox is not an emergency channel. Avoid sending incident files, medical information or confidential negotiation material.</p>
+        <p>A WhatsApp button sits on the corner of the site. It opens a chat only after the forum desk number is published. Until then, use this form. Drivers with an account can leave their own mobile so a coordinator can message them.</p>
       </div>
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_15rem]">
         <QuestionForm disabled={!open} />

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageIntro } from "@/components/chrome";
 import { PageIllustration } from "@/components/page-illustration";
 
@@ -29,6 +30,7 @@ export default function ConductPage() {
       <ul className="mt-8 grid gap-3">
         {rules.map((rule) => <li key={rule} className="dv-card p-4 text-lg">{rule}</li>)}
       </ul>
+      <p className="mt-6 text-[var(--dv-muted)]">The same standard applies to a WhatsApp message with a coordinator. The <Link className="underline" href="/terms">terms and conditions</Link> have to be accepted before a driver account can send a form.</p>
     </main>
   );
 }

@@ -1,4 +1,4 @@
-export const PUBLIC_PATHS = ["/", "/our-plan", "/priorities", "/updates", "/about", "/code-of-conduct", "/privacy", "/contact"] as const;
+export const PUBLIC_PATHS = ["/", "/our-plan", "/priorities", "/updates", "/about", "/code-of-conduct", "/privacy", "/cookies", "/terms", "/contact"] as const;
 
 export const PRIVATE_PREFIXES = ["/portal", "/admin", "/api", "/auth", "/sign-in"] as const;
 

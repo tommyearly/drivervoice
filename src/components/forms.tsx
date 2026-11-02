@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useMemo } from "react";
 import { useFormStatus } from "react-dom";
 import { CONCERN_CONFIRMATION, INCIDENT_WARNING, OFF_DUTY_NOTICE, SURVEY_DISCLAIMER } from "@/lib/copy";
@@ -221,17 +222,35 @@ export function QuestionForm({ disabled }: { disabled: boolean }) {
   );
 }
 
-export function ProfileForm({ disabled, name }: { disabled: boolean; name: string }) {
+export function ProfileForm({
+  disabled,
+  name,
+  mobile = "",
+  termsAccepted = false,
+  whatsappConsent = false,
+}: {
+  disabled: boolean;
+  name: string;
+  mobile?: string;
+  termsAccepted?: boolean;
+  whatsappConsent?: boolean;
+}) {
   const [state, action] = useActionState(updateProfileAction, { ok: false, error: "" });
+  const fieldErrors = state.ok ? {} : state.fieldErrors ?? {};
   return (
     <form action={action} className="grid gap-4">
-      {state.ok ? <p role="status">Your account details have been updated.</p> : null}
+      {state.ok ? <p role="status">Your account details have been updated. Coordinators can now use WhatsApp for the mobile number you saved.</p> : null}
       {!state.ok && state.error ? <p className="field-error" role="alert">{state.error}</p> : null}
       <label className="font-semibold">Display name
         <input name="displayName" className="dv-input mt-2" defaultValue={name} />
       </label>
+      <label className="font-semibold" htmlFor="field-mobile">Mobile for WhatsApp
+        <span className="mt-1 block text-base font-normal text-[var(--dv-muted)]">Use your own mobile. Start with 08, or include the country code. A coordinator and the technical administrator can see it. It is not published.</span>
+        <input id="field-mobile" name="mobile" type="tel" inputMode="tel" autoComplete="tel" className="dv-input mt-2" defaultValue={mobile} aria-invalid={Boolean(fieldErrors.mobile)} />
+      </label>
+      {fieldErrors.mobile ? <p className="field-error">{fieldErrors.mobile}</p> : null}
       <label className="font-semibold">Contact preference
-        <select name="contactPreference" className="dv-select mt-2" defaultValue="account">
+        <select name="contactPreference" className="dv-select mt-2" defaultValue={whatsappConsent ? "phone" : "account"}>
           <option value="account">Through this account</option>
           <option value="phone">Phone</option>
           <option value="email">Email</option>
@@ -243,6 +262,16 @@ export function ProfileForm({ disabled, name }: { disabled: boolean; name: strin
           <option value="yes">Yes, headline and link only</option>
         </select>
       </label>
+      <label className="flex items-start gap-3 font-normal">
+        <input className="mt-1 h-5 w-5" type="checkbox" name="whatsappConsent" value="yes" defaultChecked={whatsappConsent} />
+        <span>A coordinator may contact this number on WhatsApp about my account and forum business. This is not an emergency line, and the chat is not a case file.</span>
+      </label>
+      {fieldErrors.whatsappConsent ? <p className="field-error">{fieldErrors.whatsappConsent}</p> : null}
+      <label className="flex items-start gap-3 font-normal">
+        <input className="mt-1 h-5 w-5" type="checkbox" name="termsAccepted" value="yes" defaultChecked={termsAccepted} />
+        <span>I have read and accept the <Link className="font-semibold underline" href="/terms">terms and conditions</Link> and the <Link className="font-semibold underline" href="/privacy">privacy notice</Link>.</span>
+      </label>
+      {fieldErrors.termsAccepted ? <p className="field-error">{fieldErrors.termsAccepted}</p> : null}
       <button className="touch w-fit rounded-full bg-navy px-5 font-semibold text-white disabled:opacity-50" disabled={disabled}>Save account details</button>
     </form>
   );

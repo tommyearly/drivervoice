@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { signDemoToken } from "@/lib/auth/demo-token";
 import { getSessionActor } from "@/lib/auth/session";
 import { acknowledgementEmail, invitationEmail, resolveMode, siteOrigin, statusEmail, type ReportStatus } from "@/lib/domain";
+import { signupComplete, TERMS_VERSION } from "@/lib/consent";
+import { normaliseMobile } from "@/lib/phone";
 import { getRepository } from "@/lib/data/repository";
 import { sendMail } from "@/lib/email/send";
 import { consumeRate, hashRateKey } from "@/lib/rate-limit";
@@ -45,6 +47,12 @@ async function actorOrError(): Promise<Actor | { ok: false; error: string }> {
   return actor;
 }
 
+async function signupGate(actor: Actor): Promise<Result<never> | null> {
+  const state = await getRepository().signupState(actor);
+  if (!state || signupComplete(state)) return null;
+  return { ok: false, error: "Accept the current terms and save a WhatsApp mobile number on your account before sending this." };
+}
+
 export async function demoSignInAction(formData: FormData) {
   if (resolveMode(process.env) !== "demo") return;
   const token = signDemoToken(String(formData.get("demoUser") || ""));
@@ -71,9 +79,23 @@ export async function signOutAction() {
 }
 
 export async function requestLinkAction(_prev: Result<{ sent: boolean }>, formData: FormData): Promise<Result<{ sent: boolean }>> {
-  if (resolveMode(process.env) !== "live") return { ok: false, error: "Email sign-in is available once Supabase is configured." };
   const email = String(formData.get("email") || "").trim().toLowerCase();
   if (!email.includes("@")) return { ok: false, error: "Enter the email address used for your invitation." };
+  const mobile = normaliseMobile(String(formData.get("mobile") || ""));
+  if (!mobile) return { ok: false, error: "Enter the mobile number a coordinator may use on WhatsApp." };
+  if (String(formData.get("whatsapp") || "") !== "yes") return { ok: false, error: "Confirm that a coordinator may contact that number on WhatsApp." };
+  if (String(formData.get("terms") || "") !== "yes") return { ok: false, error: "Accept the terms and conditions before we email a sign-in link." };
+  const jar = await cookies();
+  jar.set("dv_pending_signup", JSON.stringify({ mobile, termsVersion: TERMS_VERSION }), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 12,
+  });
+  if (resolveMode(process.env) !== "live") {
+    return { ok: false, error: "Email sign-in is available once Supabase is configured. The number you typed can be saved on your account after you sign in." };
+  }
   const gate = limited(`signin:${hashRateKey(email)}`);
   if (gate) return gate;
   const supabase = await createClient();
@@ -88,6 +110,8 @@ export async function requestLinkAction(_prev: Result<{ sent: boolean }>, formDa
 export async function submitConcernAction(_prev: Result<{ reference: string; status: string }>, formData: FormData): Promise<Result<{ reference: string; status: string }>> {
   const actor = await actorOrError();
   if (!isActor(actor)) return actor;
+  const blocked = await signupGate(actor);
+  if (blocked) return blocked;
   const gate = limited(`concern:${actor.id}`);
   if (gate) return gate;
   const parsed = concernSchema.safeParse(Object.fromEntries(formData));
@@ -105,6 +129,8 @@ export async function submitConcernAction(_prev: Result<{ reference: string; sta
 export async function submitIncidentAction(_prev: Result<{ reference: string; status: string }>, formData: FormData): Promise<Result<{ reference: string; status: string }>> {
   const actor = await actorOrError();
   if (!isActor(actor)) return actor;
+  const blocked = await signupGate(actor);
+  if (blocked) return blocked;
   const gate = limited(`incident:${actor.id}`);
   if (gate) return gate;
   const parsed = incidentSchema.safeParse(Object.fromEntries(formData));
@@ -118,6 +144,8 @@ export async function submitIncidentAction(_prev: Result<{ reference: string; st
 export async function submitSurveyAction(_prev: Result<{ saved: true }>, formData: FormData): Promise<Result<{ saved: true }>> {
   const actor = await actorOrError();
   if (!isActor(actor)) return actor;
+  const blocked = await signupGate(actor);
+  if (blocked) return blocked;
   const parsed = surveySchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, error: "Check the highlighted fields.", fieldErrors: fieldErrors(parsed.error) };
   return getRepository().saveSurvey(actor, parsed.data);
@@ -126,6 +154,8 @@ export async function submitSurveyAction(_prev: Result<{ saved: true }>, formDat
 export async function submitVolunteerAction(_prev: Result<{ saved: true }>, formData: FormData): Promise<Result<{ saved: true }>> {
   const actor = await actorOrError();
   if (!isActor(actor)) return actor;
+  const blocked = await signupGate(actor);
+  if (blocked) return blocked;
   const parsed = volunteerSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, error: "Check the highlighted fields.", fieldErrors: fieldErrors(parsed.error) };
   return getRepository().saveVolunteer(actor, parsed.data);
@@ -135,6 +165,10 @@ export async function submitQuestionAction(_prev: Result<{ reference: string }>,
   const parsed = questionSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, error: "Check the highlighted fields.", fieldErrors: fieldErrors(parsed.error) };
   const actor = await getSessionActor();
+  if (actor && actor.status === "active") {
+    const blocked = await signupGate(actor);
+    if (blocked) return blocked;
+  }
   const key = hashRateKey(actor?.id || "public");
   const gate = limited(`question:${key}`);
   if (gate) return gate;
@@ -147,7 +181,12 @@ export async function updateProfileAction(_prev: Result<{ saved: true }>, formDa
   if (!isActor(actor)) return actor;
   const parsed = profileSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, error: "Check the highlighted fields.", fieldErrors: fieldErrors(parsed.error) };
-  return getRepository().updateProfile(actor, parsed.data);
+  const saved = await getRepository().updateProfile(actor, parsed.data);
+  if (saved.ok) {
+    revalidatePath("/portal/account");
+    revalidatePath("/admin/members");
+  }
+  return saved;
 }
 
 export async function addNoteAction(formData: FormData): Promise<void> {

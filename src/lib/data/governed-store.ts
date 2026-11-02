@@ -37,6 +37,7 @@ import {
 } from "@/lib/domain";
 import type { ActionView, DataStore, ReportCore, Result } from "@/lib/data/types";
 import { IDS } from "@/lib/data/ids";
+import { TERMS_VERSION } from "@/lib/consent";
 
 const DENIED = "You do not have access to that record.";
 const SIGN_IN = "Sign in with an active account to continue.";
@@ -57,6 +58,10 @@ interface Profile {
   contactPreference: "account" | "phone" | "email";
   emailUpdates: boolean;
   fictional: boolean;
+  mobile: string | null;
+  whatsappConsent: boolean;
+  termsAcceptedAt: string | null;
+  termsVersion: string | null;
 }
 
 interface RoleAssignment {
@@ -324,7 +329,19 @@ export function createGovernedStore(options: Options = {}): DataStore {
     contactPreference: "account" as const,
     emailUpdates: false,
     fictional: true,
+    mobile: null,
+    whatsappConsent: false,
+    termsAcceptedAt: null,
+    termsVersion: null,
   }));
+
+  profiles.forEach((profile, index) => {
+    if (profile.id === IDS.driverB || profile.id === IDS.pending || profile.id === IDS.revoked) return;
+    profile.mobile = `+3538700001${String(index).padStart(2, "0")}`;
+    profile.whatsappConsent = true;
+    profile.termsAcceptedAt = "2026-10-01T00:00:00.000Z";
+    profile.termsVersion = TERMS_VERSION;
+  });
 
   const role = (profile: keyof typeof IDS, assigned: Role, id: string): RoleAssignment => ({
     id,
@@ -921,7 +938,22 @@ export function createGovernedStore(options: Options = {}): DataStore {
         status: profile.status,
         roles: assignments.filter((item) => item.profileId === profile.id && !item.revokedAt).map((item) => item.role),
         fictional: profile.fictional,
+        mobile: profile.mobile,
+        whatsappConsent: profile.whatsappConsent,
+        termsAcceptedAt: profile.termsAcceptedAt,
       }));
+    },
+    async signupState(presented) {
+      const actor = resolve(presented);
+      if (!actor) return null;
+      const profile = profiles.find((item) => item.id === actor.id);
+      if (!profile) return null;
+      return {
+        mobile: profile.mobile,
+        whatsappConsent: profile.whatsappConsent,
+        termsAcceptedAt: profile.termsAcceptedAt,
+        termsVersion: profile.termsVersion,
+      };
     },
     async listAudit(presented) {
       const actor = resolve(presented);
@@ -1507,7 +1539,13 @@ export function createGovernedStore(options: Options = {}): DataStore {
       profile.displayName = input.displayName;
       profile.contactPreference = input.contactPreference;
       profile.emailUpdates = input.emailUpdates === "yes";
-      audit(actor, "account", "profile_updated", "profile", actor.id, null, null);
+      profile.mobile = input.mobile;
+      profile.whatsappConsent = input.whatsappConsent === "yes";
+      if (profile.termsVersion !== TERMS_VERSION || !profile.termsAcceptedAt) {
+        profile.termsAcceptedAt = stamp();
+        profile.termsVersion = TERMS_VERSION;
+      }
+      audit(actor, "account", "profile_updated", "profile", actor.id, null, "terms_accepted");
       return { ok: true, data: { saved: true } };
     },
     async saveSettings(presented, input) {

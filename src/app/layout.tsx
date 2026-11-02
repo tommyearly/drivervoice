@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Literata, Source_Sans_3 } from "next/font/google";
 import { DemoBanner, SiteFooter, SiteHeader } from "@/components/chrome";
+import { ConsentBanner } from "@/components/consent-banner";
 import { DesignPanel } from "@/components/design-panel";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { getSessionActor } from "@/lib/auth/session";
 import { getRepository } from "@/lib/data/repository";
 import { siteOrigin } from "@/lib/domain";
+import { publishedWhatsAppNumber } from "@/lib/phone";
 import { SUBTITLE } from "./_forum-copy";
 import "./globals.css";
 
@@ -33,6 +36,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SiteHeader signedIn={Boolean(actor && actor.status === "active")} />
         {children}
         <SiteFooter />
+        <WhatsAppFloat number={publishedWhatsAppNumber()} />
+        <ConsentBanner />
         {process.env.NEXT_PUBLIC_DESIGN_PANEL === "true" ? <DesignPanel /> : null}
       </body>
     </html>

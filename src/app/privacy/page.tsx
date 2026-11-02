@@ -53,6 +53,14 @@ export default async function PrivacyPage() {
           <p className="mt-3">Depending on the circumstances, you may have rights to access, correct, erase or restrict use of your information, to object to processing, and to receive portable data. Where processing relies on consent, you may withdraw it without affecting earlier lawful processing. Contact the controller listed above to exercise your rights. You may also complain to the <a className="underline" href="https://www.dataprotection.ie/">Data Protection Commission</a>.</p>
           <p className="mt-3">Check the published notice for the information collected, who receives it, how long it is kept, any overseas transfers and any applicable automated decision-making. If those details are missing or unclear, ask before submitting. Removing a name does not necessarily make a record anonymous.</p>
         </section>
+        <section>
+          <h2 className="text-2xl">WhatsApp and your mobile number</h2>
+          <p className="mt-3">If you finish signup, the mobile number you give is used so a coordinator can message you on WhatsApp about your account and forum business. Coordinators and the technical administrator can see it. It is not put on the public website. WhatsApp is a separate service, so the message is not kept only inside Drivers Voice. Do not use it for emergencies, medical information, incident files or confidential negotiation papers. You can ask for the number to be removed. The <a className="underline" href="/terms">terms</a> explain the limits.</p>
+        </section>
+        <section>
+          <h2 className="text-2xl">Cookies</h2>
+          <p className="mt-3">An essential cookie keeps a signed-in session. A separate preference cookie remembers whether you accepted or rejected optional cookies. The site does not use advertising or analytics cookies. You can change the choice at any time on the <a className="underline" href="/cookies">cookie note</a>.</p>
+        </section>
         <p>{INDEPENDENCE_NOTICE}</p>
       </div>
     </main>

@@ -3,6 +3,7 @@ import { PageIllustration } from "@/components/page-illustration";
 import { grantRoleAction, inviteAction, revokeMemberAction } from "@/server/actions";
 import { getSessionActor } from "@/lib/auth/session";
 import { getRepository } from "@/lib/data/repository";
+import { DRIVER_WHATSAPP_NOTE, formatMobile, whatsAppUrl } from "@/lib/phone";
 
 export const metadata = { title: "Members" };
 
@@ -24,6 +25,7 @@ export default async function MembersPage() {
         <PageIllustration asset="about" variant="detail" />
       </div>
       <p className="mt-3">Invitations do not request staff ID photographs, payslips or union cards. A coordinator confirms eligibility separately. You cannot grant a role to your own account.</p>
+      <p className="mt-3">A driver number appears here only after that driver accepts the terms and agrees to WhatsApp contact. The public desk button is a different number, added when the forum line is ready. Do not send case files over WhatsApp.</p>
       <form action={inviteAction} className="mt-4 flex flex-wrap gap-3">
         <label className="font-semibold">Invite by email<input name="email" type="email" className="dv-input mt-2" /></label>
         <button className="touch self-end rounded-full bg-teal px-4 font-semibold text-white" disabled={!writes}>Create invitation</button>
@@ -33,6 +35,18 @@ export default async function MembersPage() {
           <li key={member.id} className="dv-card p-4">
             <p className="font-semibold">{member.displayName}{member.fictional ? " · Fictional demonstration account" : ""}</p>
             <p className="text-sm">{member.status} · {member.roles.join(", ") || "no role"}</p>
+            <p className="mt-2 text-sm">{member.termsAcceptedAt ? `Terms accepted ${member.termsAcceptedAt.slice(0, 10)}.` : "Terms not accepted yet."}</p>
+            {member.mobile && member.whatsappConsent ? (
+              member.fictional ? (
+                <p className="mt-2 text-sm">WhatsApp-ready fictional number {formatMobile(member.mobile)}. Demonstration accounts do not open a real chat.</p>
+              ) : (
+                <a className="touch mt-2 inline-flex items-center rounded-full bg-teal px-4 font-semibold text-white" href={whatsAppUrl(member.mobile, DRIVER_WHATSAPP_NOTE)} target="_blank" rel="noopener noreferrer">
+                  WhatsApp {formatMobile(member.mobile)}
+                </a>
+              )
+            ) : (
+              <p className="mt-2 text-sm">No WhatsApp number yet. The driver still needs to accept the terms and save a mobile on their account.</p>
+            )}
             <form action={revokeMemberAction} className="mt-2"><input type="hidden" name="profileId" value={member.id} /><button className="touch rounded-full border border-navy/20 px-3" disabled={!writes}>Revoke access</button></form>
             <form action={grantRoleAction} className="mt-2 flex flex-wrap gap-2">
               <input type="hidden" name="profileId" value={member.id} />

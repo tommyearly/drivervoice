@@ -2,6 +2,7 @@ import type { Actor, PublicUpdate, ReportStatus, Role, VerificationStatus } from
 import { COLLECTION_CLOSED, DEMO_WRITE_BLOCKED, OVERLAP_ERROR } from "@/lib/copy";
 import { canConfirmPrivacy, canReadNotes, canReadReport, privacyReady, toPublicUpdate, updateDue, type PrivacySettings, type UpdateDraft } from "@/lib/domain";
 import type { DataStore, ReportView, Result } from "@/lib/data/types";
+import { TERMS_VERSION } from "@/lib/consent";
 import { createClient } from "@/lib/supabase/server";
 
 type Row = Record<string, unknown>;
@@ -372,7 +373,7 @@ export function createLiveStore(): DataStore {
       if (!actor || (!actor.roles.includes("tech_admin") && !actor.roles.includes("coordinator"))) return [];
       const supabase = await createClient();
       const [{ data }, { data: roleRows }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, status"),
+        supabase.from("profiles").select("id, display_name, status, mobile_e164, whatsapp_consent, terms_accepted_at"),
         supabase.from("role_assignments").select("profile_id, role").is("revoked_at", null),
       ]);
       return (data ?? []).map((row) => ({
@@ -384,7 +385,27 @@ export function createLiveStore(): DataStore {
           .map((item) => item.role)
           .filter((role): role is Role => ["driver", "reviewer", "coordinator", "editor", "publisher", "tech_admin", "survey_admin"].includes(role)),
         fictional: false,
+        mobile: row.mobile_e164 ?? null,
+        whatsappConsent: Boolean(row.whatsapp_consent),
+        termsAcceptedAt: row.terms_accepted_at ?? null,
       }));
+    },
+    async signupState(presented) {
+      const actor = await current(presented);
+      if (!actor) return null;
+      const supabase = await createClient();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("mobile_e164, whatsapp_consent, terms_accepted_at, terms_version")
+        .eq("id", actor.id)
+        .maybeSingle();
+      if (error || !data) return null;
+      return {
+        mobile: data.mobile_e164 ?? null,
+        whatsappConsent: Boolean(data.whatsapp_consent),
+        termsAcceptedAt: data.terms_accepted_at ?? null,
+        termsVersion: data.terms_version ?? null,
+      };
     },
     async listAudit(presented) {
       const actor = await current(presented);
@@ -533,7 +554,15 @@ export function createLiveStore(): DataStore {
       return rpc("revoke_member", { profile_id: input.profileId });
     },
     async updateProfile(_actor, input) {
-      return rpc("update_own_profile", { display_name: input.displayName, contact_preference: input.contactPreference, email_updates: input.emailUpdates === "yes" });
+      return rpc("update_own_profile", {
+        display_name: input.displayName,
+        contact_preference: input.contactPreference,
+        email_updates: input.emailUpdates === "yes",
+        mobile_e164: input.mobile,
+        whatsapp_consent: input.whatsappConsent === "yes",
+        terms_accepted: input.termsAccepted,
+        terms_version: TERMS_VERSION,
+      });
     },
     async saveSettings(_actor, input) {
       return rpc("save_privacy_settings", { payload: input });

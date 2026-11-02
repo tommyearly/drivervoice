@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ACTION_STATUSES, CONCERN_CATEGORIES, INCIDENT_CATEGORIES, REPORT_STATUSES, SURVEY_OPTIONS } from "@/lib/domain";
+import { normaliseMobile } from "@/lib/phone";
 
 const dateField = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date.");
 const optionalDate = z.string().regex(/^$|^\d{4}-\d{2}-\d{2}$/, "Enter a date or leave this blank.");
@@ -102,10 +103,23 @@ export const questionSchema = z.object({
   companyWebsite: z.string().max(0).optional().or(z.literal("")),
 });
 
+const accepted = (message: string) =>
+  z.preprocess((value) => (value == null ? "" : value), z.string()).refine((value) => value === "yes", { message });
+
 export const profileSchema = z.object({
   displayName: shortText(2, 80),
   contactPreference: z.enum(["account", "phone", "email"]),
   emailUpdates: z.enum(["yes", "no"]),
+  mobile: z.string().trim().transform((value, context) => {
+    const next = normaliseMobile(value);
+    if (!next) {
+      context.addIssue({ code: "custom", message: "Enter a mobile number a coordinator can use on WhatsApp." });
+      return z.NEVER;
+    }
+    return next;
+  }),
+  whatsappConsent: accepted("Confirm that a coordinator may contact this number on WhatsApp."),
+  termsAccepted: accepted("Accept the terms and conditions."),
 });
 
 export const noteSchema = z.object({

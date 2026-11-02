@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionActor } from "@/lib/auth/session";
+import { signupComplete } from "@/lib/consent";
+import { getRepository } from "@/lib/data/repository";
 import { isPrivileged, resolveMode } from "@/lib/domain";
 
 export const metadata = { robots: { index: false, follow: false } };
@@ -29,6 +31,9 @@ export default async function PortalLayout({ children }: { children: React.React
       </main>
     );
   }
+  const store = getRepository();
+  const [signup, open] = await Promise.all([store.signupState(actor), store.collectionState()]);
+  const needsTerms = Boolean(signup) && !signupComplete(signup);
   const showMfa = resolveMode(process.env) === "live" && isPrivileged(actor) && actor.mfa !== "aal2";
   return (
     <div className="mx-auto grid max-w-6xl gap-8 px-5 py-8 lg:grid-cols-[16rem_1fr]">
@@ -40,6 +45,16 @@ export default async function PortalLayout({ children }: { children: React.React
       </nav>
       <div>
         {showMfa ? <p className="mb-4 rounded-dv bg-amber/30 p-4 font-semibold">Multi-factor authentication is required before this privileged account can be used. Open Account to enrol it.</p> : null}
+        {needsTerms ? (
+          <p className="mb-4 rounded-dv border border-amber bg-amber/20 p-4">
+            <span className="block font-semibold text-navy">Finish signup before you send a form</span>
+            <span className="mt-1 block">
+              {open
+                ? <>Add the mobile number a coordinator may use on WhatsApp, and accept the current terms. <Link className="font-semibold underline" href="/portal/account">Open account</Link></>
+                : <>The terms and a WhatsApp mobile are required. They can be saved once live collection is open. <Link className="font-semibold underline" href="/terms">Read the terms</Link></>}
+            </span>
+          </p>
+        ) : null}
         {children}
       </div>
     </div>

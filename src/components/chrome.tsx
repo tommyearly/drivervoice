@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/consent-banner";
 import { Mark } from "@/components/icons";
 import { INDEPENDENCE_NOTICE, SITE_DOMAIN, SITE_NAME, SUBTITLE } from "@/lib/copy";
 
@@ -73,6 +74,8 @@ export function SiteFooter() {
             ["/about", "About"],
             ["/code-of-conduct", "Conduct"],
             ["/privacy", "Privacy"],
+            ["/cookies", "Cookies"],
+            ["/terms", "Terms"],
             ["/contact", "Contact"],
             ["/sign-in", "Driver sign in"],
             ["/our-plan", "Working plan"],
@@ -81,6 +84,7 @@ export function SiteFooter() {
               {label}
             </Link>
           ))}
+          <CookieSettingsButton />
         </div>
       </div>
       <p className="border-t border-white/10 px-5 py-4 text-center text-sm text-white/70">

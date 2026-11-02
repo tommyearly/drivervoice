@@ -141,6 +141,16 @@ export interface MemberView {
   status: string;
   roles: Role[];
   fictional: boolean;
+  mobile: string | null;
+  whatsappConsent: boolean;
+  termsAcceptedAt: string | null;
+}
+
+export interface SignupContactView {
+  mobile: string | null;
+  whatsappConsent: boolean;
+  termsAcceptedAt: string | null;
+  termsVersion: string | null;
 }
 
 export interface AuditView {
@@ -192,6 +202,7 @@ export interface DataStore {
   listOwnQuestions(actor: Actor): Promise<{ id: string; reference: string; pageRef: string; question: string; status: string }[]>;
   listProcess(actor: Actor): Promise<{ id: string; processType: string; referralDate: string; referenceNumber: string; confirmationSource: string; confirmationDate: string; requestedInformation: string; requestDate: string; requestedReplyDate: string; responseReceived: string; responsibleRole: string; nextStep: string; reviewDate: string }[]>;
   listMembers(actor: Actor): Promise<MemberView[]>;
+  signupState(actor: Actor): Promise<SignupContactView | null>;
   listAudit(actor: Actor): Promise<AuditView[]>;
   settingsFor(actor: Actor): Promise<SettingsView | null>;
   listUpdateDrafts(actor: Actor): Promise<(PublicUpdate & { status: string; sourceRecord: string; reviewedBy: string; internalNote: string; editorReviewedBy: string | null })[]>;

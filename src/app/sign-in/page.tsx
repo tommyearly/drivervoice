@@ -14,7 +14,7 @@ export default function SignInPage() {
           <div className="mt-4 grid gap-3 text-[var(--dv-muted)]">
             <p>Use the email address linked to your invitation. Do not use a company payroll, staff-portal or union password. Access approval confirms eligibility for this forum only; it does not confirm union membership or a representative appointment.</p>
           </div>
-          <p className="mt-4 text-xl">Access is by invitation. Signing in does not confirm eligibility, and this is not an official company or union account.</p>
+          <p className="mt-4 text-xl">Access is by invitation. Signing in does not confirm eligibility, and this is not an official company or union account. A sign-in link is sent only after you accept the terms and offer a mobile number for WhatsApp.</p>
           <SignInForm demonstration={resolveMode(process.env) !== "live"} />
         </div>
         <PageIllustration asset="privacy" variant="form" className="order-first lg:order-none lg:mt-2" />
